@@ -10,7 +10,7 @@ from PySide6.QtCore import Qt, QThread, Signal, QObject
 from PySide6.QtGui import QFont
 
 from core.video_info import get_video_info, VideoInfo
-from core.processor import process_video, extract_audio, ProcessingTask
+from core.processor import process_video, extract_audio, split_video, ProcessingTask
 from ui.panels.file_panel import FilePanel
 from ui.panels.operations_panel import OperationsPanel
 from ui.widgets.progress_widget import ProgressWidget
@@ -171,8 +171,14 @@ class MainWindow(QMainWindow):
         has_video_ops = any(
             config.get(f"_enabled_{title}")
             for title in ["Trim", "Crop", "Change FPS", "Change Bitrate",
-                          "Change Format", "Mute Audio", "Change Resolution", "Speed Change"]
+                          "Change Format", "Volume", "Change Resolution", "Speed Change"]
         )
+        _split_on = config.get("_enabled_Split", False)
+        split_x = config.get("split_x") if _split_on else None
+        split_y = config.get("split_y") if _split_on else None
+        split_x_half = bool(config.get("split_x_half")) if _split_on else False
+        split_y_half = bool(config.get("split_y_half")) if _split_on else False
+        split_enabled = split_x_half or split_y_half or bool(split_x or split_y)
 
         for idx, path in enumerate(files):
             base = os.path.splitext(os.path.basename(path))[0]
@@ -183,11 +189,16 @@ class MainWindow(QMainWindow):
             else:
                 ext = os.path.splitext(path)[1].lstrip(".")
 
-            video_out = os.path.join(output_dir, f"{base}_edited.{ext}")
-
             file_label = f"[{idx + 1}/{total}] {os.path.basename(path)}"
 
             if has_video_ops:
+                # When split: process to temp, split, delete temp
+                # Otherwise: process directly to final output
+                if split_enabled:
+                    video_out = os.path.join(output_dir, f"{base}__split_tmp.{ext}")
+                else:
+                    video_out = os.path.join(output_dir, f"{base}_edited.{ext}")
+
                 task = ProcessingTask(
                     input_path=path,
                     output_path=video_out,
@@ -198,7 +209,7 @@ class MainWindow(QMainWindow):
                     video_bitrate=config.get("video_bitrate") if config.get("_enabled_Change Bitrate") else None,
                     output_format=config.get("output_format") if config.get("_enabled_Change Format") else None,
                     output_extension=config.get("output_extension") if config.get("_enabled_Change Format") else None,
-                    mute=bool(config.get("_enabled_Mute Audio")),
+                    volume=config.get("volume") if config.get("_enabled_Volume") else None,
                     resolution=config.get("resolution") if config.get("_enabled_Change Resolution") else None,
                     speed=config.get("speed") if config.get("_enabled_Speed Change") else None,
                 )
@@ -206,6 +217,24 @@ class MainWindow(QMainWindow):
                     process_video,
                     [task],
                     {"progress_cb": lambda pct, msg, lbl=file_label: self._worker.progress.emit(pct, f"{lbl} — {msg}")},
+                ))
+
+                if split_enabled:
+                    tmp = video_out
+                    tasks.append((
+                        split_video,
+                        [tmp, output_dir, base, ext, split_x, split_y],
+                        {"half_x": split_x_half, "half_y": split_y_half,
+                         "progress_cb": lambda pct, msg, lbl=file_label: self._worker.progress.emit(pct, f"{lbl} (split) — {msg}")},
+                    ))
+                    tasks.append((os.remove, [tmp], {}))
+
+            elif split_enabled:
+                tasks.append((
+                    split_video,
+                    [path, output_dir, base, ext, split_x, split_y],
+                    {"half_x": split_x_half, "half_y": split_y_half,
+                     "progress_cb": lambda pct, msg, lbl=file_label: self._worker.progress.emit(pct, f"{lbl} (split) — {msg}")},
                 ))
 
             if extract_fmt:

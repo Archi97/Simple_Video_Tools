@@ -17,6 +17,7 @@ from ui.operations.op_extract_audio import ExtractAudioOperation
 from ui.operations.op_mute import MuteOperation
 from ui.operations.op_resolution import ResolutionOperation
 from ui.operations.op_speed import SpeedOperation
+from ui.operations.op_split import SplitOperation
 
 
 class OperationsPanel(QWidget):
@@ -96,6 +97,7 @@ class OperationsPanel(QWidget):
             TrimOperation,
             CropOperation,
             ResolutionOperation,
+            SplitOperation,
         ]
         for cls in op_classes:
             op = cls()
@@ -104,6 +106,7 @@ class OperationsPanel(QWidget):
             op._toggle.toggled.connect(lambda _: self.config_changed.emit())
             self._ops_layout.insertWidget(self._ops_layout.count() - 1, op)
             self._operations.append(op)
+
 
     # ── Accordion behaviour ───────────────────────────────────────────────────
 

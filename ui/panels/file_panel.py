@@ -3,10 +3,34 @@ import os
 from typing import Callable, Optional
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel, QListWidget, QListWidgetItem,
-    QPushButton, QFileDialog, QLineEdit, QFrame, QSizePolicy, QAbstractItemView
+    QPushButton, QFileDialog, QLineEdit, QFrame, QSizePolicy, QAbstractItemView,
+    QStyledItemDelegate, QStyleOptionViewItem
 )
-from PySide6.QtCore import Qt, Signal, QTimer
-from PySide6.QtGui import QDragEnterEvent, QDropEvent
+from PySide6.QtCore import Qt, Signal, QTimer, QRectF
+from PySide6.QtGui import QDragEnterEvent, QDropEvent, QPainter, QColor
+
+
+class _DragHandleDelegate(QStyledItemDelegate):
+    """Draws a 2×3 dot drag handle on the left of each list item."""
+
+    def paint(self, painter, option, index):
+        opt = QStyleOptionViewItem(option)
+        opt.rect = option.rect.adjusted(18, 0, 0, 0)
+        super().paint(painter, opt, index)
+
+        painter.save()
+        painter.setRenderHint(QPainter.Antialiasing)
+        painter.setBrush(QColor("#505050"))
+        painter.setPen(Qt.NoPen)
+        x0 = option.rect.left() + 7
+        yc = option.rect.center().y()
+        for col in range(2):
+            for row in range(3):
+                cx = x0 + col * 5
+                cy = yc - 5 + row * 5
+                painter.drawEllipse(QRectF(cx - 1.5, cy - 1.5, 3, 3))
+        painter.restore()
+
 
 VIDEO_EXTENSIONS = {
     ".mp4", ".mkv", ".avi", ".mov", ".webm", ".flv",
@@ -37,9 +61,11 @@ class FilePanel(QWidget):
         # ── File list ─────────────────────────────────────────────────────────
         self._list = QListWidget()
         self._list.setSelectionMode(QAbstractItemView.ExtendedSelection)
-        self._list.setDragDropMode(QAbstractItemView.NoDragDrop)
+        self._list.setDragDropMode(QAbstractItemView.InternalMove)
+        self._list.setDefaultDropAction(Qt.MoveAction)
         self._list.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self._list.setToolTip("Drag & drop video files here")
+        self._list.setItemDelegate(_DragHandleDelegate(self._list))
         layout.addWidget(self._list)
 
         # Add / Remove buttons
@@ -67,6 +93,9 @@ class FilePanel(QWidget):
 
         self._list.itemSelectionChanged.connect(
             lambda: self._btn_remove.setEnabled(bool(self._list.selectedItems()))
+        )
+        self._list.model().rowsMoved.connect(
+            lambda: self.files_changed.emit(self.get_files())
         )
 
         # ── Separator ─────────────────────────────────────────────────────────

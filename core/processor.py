@@ -11,6 +11,7 @@ from core.ffmpeg_bin import ffmpeg_path
 _CREATE_NO_WINDOW = 0x08000000 if sys.platform == "win32" else 0
 
 
+
 @dataclass
 class ProcessingTask:
     input_path: str
@@ -24,7 +25,7 @@ class ProcessingTask:
     output_format: Optional[str] = None      # container format name, e.g. "mp4"
     output_extension: Optional[str] = None   # file extension
     extract_audio_format: Optional[str] = None  # "mp3", "aac", etc.
-    mute: bool = False
+    volume: Optional[float] = None               # None = unchanged, 0 = mute, >1 = amplify
     resolution: Optional[tuple[int, int]] = None  # (width, height)
     speed: Optional[float] = None            # 1.0 = no change
 
@@ -89,7 +90,11 @@ def _run(
 
     proc.wait()
     if proc.returncode != 0:
-        tail = "".join(stderr_lines[-10:]).strip()
+        # Prefer lines that contain actual error messages over codec stats
+        error_lines = [l for l in stderr_lines
+                       if re.search(r"\b(Error|error|Invalid|invalid|No such|Cannot|cannot|not found|failed)\b", l)
+                       and "Conversion failed" not in l]
+        tail = "".join((error_lines[-5:] if error_lines else stderr_lines[-15:])).strip()
         raise RuntimeError(f"ffmpeg error:\n{tail}")
 
 
@@ -128,10 +133,15 @@ def process_video(
     if task.fps:
         vf.append(f"fps={task.fps}")
 
+    mute = task.volume is not None and task.volume == 0
+
     if task.speed and task.speed != 1.0:
         vf.append(f"setpts={1.0 / task.speed:.6f}*PTS")
-        if not task.mute:
+        if not mute:
             af.extend(_atempo_chain(task.speed))
+
+    if task.volume is not None and task.volume != 1.0 and not mute:
+        af.append(f"volume={task.volume:.4f}")
 
     needs_video_transcode = bool(vf or task.video_bitrate)
     needs_audio_transcode = bool(af)
@@ -160,7 +170,7 @@ def process_video(
             cmd += ["-c:v", "copy"]
 
         # ── Audio ─────────────────────────────────────────────────────────────
-        if task.mute:
+        if mute:
             cmd += ["-an"]
         else:
             if af:
@@ -182,6 +192,60 @@ def process_video(
     report(2, "Processing…")
     _run(cmd, total, progress_cb, "Processing…")
     report(100, "Done.")
+
+
+def split_video(
+    input_path: str,
+    output_dir: str,
+    base_name: str,
+    extension: str,
+    split_x: Optional[int],
+    split_y: Optional[int],
+    half_x: bool = False,
+    half_y: bool = False,
+    progress_cb: Optional[Callable[[int, str], None]] = None,
+) -> None:
+    """Crop-split a processed video into 2 or 4 pieces."""
+    def report(pct: int, msg: str = "") -> None:
+        if progress_cb:
+            progress_cb(pct, msg)
+
+    report(0, "Splitting…")
+
+    # Use ffmpeg expressions for half — works correctly per-file at runtime
+    xv = "iw/2" if half_x else str(split_x)
+    yv = "ih/2" if half_y else str(split_y)
+    has_x = half_x or bool(split_x)
+    has_y = half_y or bool(split_y)
+
+    if has_x and has_y:
+        pieces = [
+            ("bottom_left",  f"crop={xv}:{yv}:0:ih-{yv}"),
+            ("bottom_right", f"crop=iw-{xv}:{yv}:{xv}:ih-{yv}"),
+            ("top_left",     f"crop={xv}:ih-{yv}:0:0"),
+            ("top_right",    f"crop=iw-{xv}:ih-{yv}:{xv}:0"),
+        ]
+    elif has_x:
+        pieces = [
+            ("left",  f"crop={xv}:ih:0:0"),
+            ("right", f"crop=iw-{xv}:ih:{xv}:0"),
+        ]
+    else:
+        pieces = [
+            ("bottom", f"crop=iw:{yv}:0:ih-{yv}"),
+            ("top",    f"crop=iw:ih-{yv}:0:0"),
+        ]
+
+    # Single ffmpeg call — one decode, multiple encoded outputs
+    cmd = [ffmpeg_path(), "-y", "-i", input_path]
+    for suffix, crop_filter in pieces:
+        out = os.path.join(output_dir, f"{base_name}_{suffix}.{extension}")
+        cmd += ["-vf", crop_filter, "-c:v", "libx264", "-preset", "fast", "-crf", "18", "-c:a", "copy", out]
+
+    _run(cmd, 0.0, progress_cb, "Splitting…")
+    report(100, "Done.")
+
+
 
 
 def extract_audio(
