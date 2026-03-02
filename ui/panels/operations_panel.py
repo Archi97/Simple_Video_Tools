@@ -18,6 +18,7 @@ from ui.operations.op_mute import MuteOperation
 from ui.operations.op_resolution import ResolutionOperation
 from ui.operations.op_speed import SpeedOperation
 from ui.operations.op_split import SplitOperation
+from ui.operations.op_merge_audio import MergeAudioOperation
 
 
 class OperationsPanel(QWidget):
@@ -98,6 +99,7 @@ class OperationsPanel(QWidget):
             CropOperation,
             ResolutionOperation,
             SplitOperation,
+            MergeAudioOperation,
         ]
         for cls in op_classes:
             op = cls()

@@ -28,6 +28,7 @@ class ProcessingTask:
     volume: Optional[float] = None               # None = unchanged, 0 = mute, >1 = amplify
     resolution: Optional[tuple[int, int]] = None  # (width, height)
     speed: Optional[float] = None            # 1.0 = no change
+    merge_audio: Optional[str] = None        # path to audio file to replace video's audio
 
 
 def _atempo_chain(speed: float) -> list[str]:
@@ -112,6 +113,9 @@ def process_video(
 
     cmd += ["-i", task.input_path]
 
+    if task.merge_audio:
+        cmd += ["-i", task.merge_audio]
+
     # ── Trim (output options = frame-accurate, correct duration) ──────────────
     if task.trim_start and task.trim_start > 0:
         cmd += ["-ss", f"{task.trim_start:.6f}"]
@@ -143,7 +147,7 @@ def process_video(
     if task.volume is not None and task.volume != 1.0 and not mute:
         af.append(f"volume={task.volume:.4f}")
 
-    needs_video_transcode = bool(vf or task.video_bitrate)
+    needs_video_transcode = bool(vf or task.video_bitrate or task.merge_audio)
     needs_audio_transcode = bool(af)
 
     # ── Extract audio only ────────────────────────────────────────────────────
@@ -170,7 +174,10 @@ def process_video(
             cmd += ["-c:v", "copy"]
 
         # ── Audio ─────────────────────────────────────────────────────────────
-        if mute:
+        if task.merge_audio:
+            cmd += ["-map", "0:v:0", "-map", "1:a:0",
+                    "-af", "apad", "-shortest", "-c:a", "aac"]
+        elif mute:
             cmd += ["-an"]
         else:
             if af:

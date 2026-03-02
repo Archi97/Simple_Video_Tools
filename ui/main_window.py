@@ -9,6 +9,7 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import Qt, QThread, Signal, QObject
 from PySide6.QtGui import QFont
 
+from version import VERSION
 from core.video_info import get_video_info, VideoInfo
 from core.processor import process_video, extract_audio, split_video, ProcessingTask
 from ui.panels.file_panel import FilePanel
@@ -48,7 +49,7 @@ class Worker(QObject):
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Video Editor")
+        self.setWindowTitle(f"Video Editor v{VERSION}")
         self.setMinimumSize(1000, 640)
         self.resize(1200, 720)
         self._video_info: Optional[VideoInfo] = None
@@ -171,7 +172,8 @@ class MainWindow(QMainWindow):
         has_video_ops = any(
             config.get(f"_enabled_{title}")
             for title in ["Trim", "Crop", "Change FPS", "Change Bitrate",
-                          "Change Format", "Volume", "Change Resolution", "Speed Change"]
+                          "Change Format", "Volume", "Change Resolution", "Speed Change",
+                          "Merge with Audio"]
         )
         _split_on = config.get("_enabled_Split", False)
         split_x = config.get("split_x") if _split_on else None
@@ -212,6 +214,7 @@ class MainWindow(QMainWindow):
                     volume=config.get("volume") if config.get("_enabled_Volume") else None,
                     resolution=config.get("resolution") if config.get("_enabled_Change Resolution") else None,
                     speed=config.get("speed") if config.get("_enabled_Speed Change") else None,
+                    merge_audio=config.get("merge_audio_path") if config.get("_enabled_Merge with Audio") else None,
                 )
                 tasks.append((
                     process_video,

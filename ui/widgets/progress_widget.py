@@ -1,6 +1,8 @@
 from __future__ import annotations
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QProgressBar
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QTimer
+from PySide6.QtGui import QColor
+from version import VERSION
 
 
 class ProgressWidget(QWidget):
@@ -13,10 +15,19 @@ class ProgressWidget(QWidget):
         layout.setContentsMargins(16, 6, 16, 8)
         layout.setSpacing(4)
 
+        top_row = QHBoxLayout()
+        top_row.setContentsMargins(0, 0, 0, 0)
+
         self._status = QLabel("Ready.")
         self._status.setObjectName("labelMuted")
         self._status.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
-        layout.addWidget(self._status)
+        top_row.addWidget(self._status, stretch=1)
+
+        self._credit = QLabel(f"v{VERSION} · by Tyombo")
+        self._credit.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        top_row.addWidget(self._credit)
+
+        layout.addLayout(top_row)
 
         self._bar = QProgressBar()
         self._bar.setRange(0, 100)
@@ -24,6 +35,16 @@ class ProgressWidget(QWidget):
         self._bar.setFixedHeight(6)
         self._bar.setTextVisible(False)
         layout.addWidget(self._bar)
+
+        self._hue = 0.0
+        self._timer = QTimer(self)
+        self._timer.timeout.connect(self._cycle_color)
+        self._timer.start(40)
+
+    def _cycle_color(self) -> None:
+        self._hue = (self._hue + 0.012) % 1.0
+        color = QColor.fromHsvF(self._hue, 0.85, 1.0)
+        self._credit.setStyleSheet(f"color: {color.name()}; font-weight: 600; font-size: 11px;")
 
     def set_progress(self, value: int, message: str = "") -> None:
         self._bar.setValue(value)
