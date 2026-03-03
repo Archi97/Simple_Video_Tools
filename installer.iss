@@ -1,7 +1,7 @@
 [Setup]
 AppName=Video Editor
 AppVersion=1.0
-AppPublisher=Your Name
+AppPublisher=Tyombo
 DefaultDirName={autopf}\VideoEditor
 DefaultGroupName=Video Editor
 OutputDir=dist

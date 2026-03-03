@@ -1,31 +1,51 @@
 # Video Editor
 
-A simple desktop video editor built with Python and PySide6.
+A free, simple desktop video editor. No subscriptions, no cloud, no special software needed.
+
+Built with Python + PySide6 + ffmpeg.
+
+---
 
 ## Features
 
-- Trim, Crop, Change Resolution
-- Change FPS, Bitrate, Speed
-- Change output format, Extract audio, Mute
-- Presets — save and load operation configs
+- Trim
+- Crop
+- Change Resolution
+- Change FPS `+batch`
+- Change Bitrate `+batch`
+- Change Speed `+batch`
+- Change Format / Convert `+batch`
+- Volume (0 = mute, up to 3× amplify) `+batch`
+- Extract Audio `+batch`
+- Split (horizontal / vertical) `+batch`
+- Merge with Audio
+
+- Drag-and-drop file reordering
+- Save / load operation presets
 - Batch mode — process multiple files at once
+- Dark theme with custom title bar
+
+---
 
 ## Requirements
 
 - Python 3.10+
-- ffmpeg & ffprobe binaries
+- ffmpeg & ffprobe binaries (see Setup)
+
+---
 
 ## Setup
 
 **1. Clone the repo**
 ```
 git clone <repo-url>
-cd video-editor
+cd Simple_video_tool
 ```
 
 **2. Add ffmpeg binaries**
 
-Download a static ffmpeg build from https://ffmpeg.org/download.html and place the binaries in the `bin/` folder:
+Download a static ffmpeg build from https://ffmpeg.org/download.html
+and place the binaries in the `bin/` folder:
 ```
 bin/
   ffmpeg.exe
@@ -35,16 +55,24 @@ bin/
 **3. Create a virtual environment and install dependencies**
 ```
 python -m venv venv
-venv\Scripts\activate
-pip install -r requirements.txt
+venv\Scripts\python.exe -m pip install -r requirements.txt
 ```
 
 **4. Run**
 ```
-venv\Scripts\python main.py
+venv\Scripts\python.exe main.py
 ```
+
+---
+
+## Building
+
+See `BUILD.md` for instructions on building a portable `.exe` or a Windows installer.
+
+---
 
 ## Notes
 
-- Windows only for now (macOS/Linux support planned)
-- Output files are saved as `<original_name>_edited.<ext>` in a folder you choose
+- Windows only for now
+- Output files are saved to a folder you choose
+- Presets are stored in `%APPDATA%\VideoEditor\presets.json`
