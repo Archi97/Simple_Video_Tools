@@ -114,6 +114,8 @@ class OperationsPanel(QWidget):
 
     def _on_op_expanded(self, clicked_op: OperationWidget) -> None:
         for op in self._operations:
+            if op.is_enabled():
+                continue  # enabled ops always stay open
             op.set_open(op is clicked_op and not clicked_op._is_open)
 
     # ── Preset management ─────────────────────────────────────────────────────

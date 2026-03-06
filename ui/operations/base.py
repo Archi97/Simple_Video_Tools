@@ -117,11 +117,14 @@ class OperationWidget(QWidget):
         pass
 
     def _header_clicked(self, event) -> None:
+        if self.is_enabled():
+            return  # enabled ops stay open, can't fold by clicking
         self.expanded.emit(self)
 
     def _on_toggle_changed(self, enabled: bool) -> None:
         self._content.setEnabled(enabled)
         self.toggled.emit(enabled)
+        self.set_open(enabled)  # expand on enable, fold on disable
 
     # ── Public API ────────────────────────────────────────────────────────────
 
