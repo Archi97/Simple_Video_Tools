@@ -1,3 +1,5 @@
+<img src="icon.png" width="48" align="left" style="margin-right:12px"/>
+
 # Simple Video Tools
 
 A free, simple desktop video editor. No subscriptions, no cloud, no special software needed.
@@ -10,6 +12,10 @@ Built with Python + PySide6 + ffmpeg.
 |---------|------|
 | Portable `.exe` | [Download](https://drive.google.com/file/d/1xEKaE4Q4jv0NhOcTZ0BzS3sK-dzEUpwj/view?usp=sharing) |
 | Installer | Coming soon |
+
+If you find it useful, a ⭐ star or a coffee would mean a lot!
+
+<a href="https://www.buymeacoffee.com/tyombo"><img src="https://img.buymeacoffee.com/button-api/?text=Buy me a Coffee&emoji=☕&slug=tyombo&button_colour=5F7FFF&font_colour=ffffff&font_family=Bree&outline_colour=000000&coffee_colour=FFDD00" /></a>
 
 ---
 
@@ -34,19 +40,21 @@ Built with Python + PySide6 + ffmpeg.
 
 ---
 
-## Requirements
+---
+
+## For Developers (running from source)
+
+### Requirements
 
 - Python 3.10+
 - ffmpeg & ffprobe binaries (see Setup)
 
----
-
-## Setup
+### Setup
 
 **1. Clone the repo**
 ```
 git clone <repo-url>
-cd Simple_video_tool
+cd Simple_Video_Tool
 ```
 
 **2. Add ffmpeg binaries**
