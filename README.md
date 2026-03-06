@@ -1,4 +1,4 @@
-<h1><img src="icon.png" width="40" align="absmiddle"/> Simple Video Tools</h1>
+<h1><img src="Git_medias/icon.png" width="40" align="absmiddle"/> Simple Video Tools</h1>
 
 A free, simple desktop video editor. No subscriptions, no cloud, no special software needed.
 
@@ -14,6 +14,12 @@ Built with Python + PySide6 + ffmpeg.
 If you find it useful, a ⭐ star or a coffee would mean a lot!
 
 <a href="https://www.buymeacoffee.com/tyombo"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" height="40"/></a>
+
+---
+
+## Screenshot
+
+![Screenshot](Git_medias/Interface.png)
 
 ---
 

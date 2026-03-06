@@ -1,14 +1,14 @@
 # -*- mode: python ; coding: utf-8 -*-
 
 a = Analysis(
-    ["main.py"],
-    pathex=[],
+    ["../main.py"],
+    pathex=[".."],
     binaries=[],
     datas=[
-        ("bin/ffmpeg.exe",  "bin"),
-        ("bin/ffprobe.exe", "bin"),
-        ("styles/dark.qss", "styles"),
-        ("icon.ico", "."),
+        ("../bin/ffmpeg.exe",  "bin"),
+        ("../bin/ffprobe.exe", "bin"),
+        ("../styles/dark.qss", "styles"),
+        ("../icon.ico", "."),
     ],
     hiddenimports=[],
     hookspath=[],
@@ -26,7 +26,7 @@ exe = EXE(
     [],
     exclude_binaries=True,
     name="SimpleVideoTools",
-    icon="icon.ico",
+    icon="../icon.ico",
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
