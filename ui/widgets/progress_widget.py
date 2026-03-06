@@ -23,7 +23,12 @@ class ProgressWidget(QWidget):
         self._status.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
         top_row.addWidget(self._status, stretch=1)
 
-        self._credit = QLabel(f"v{VERSION} · by Tyombo")
+        self._credit = QLabel(
+            f'v{VERSION} · by Tyombo &nbsp;·&nbsp; '
+            f'<a href="https://www.buymeacoffee.com/tyombo" '
+            f'style="color:#f5a623; text-decoration:none;">☕ Buy me a coffee</a>'
+        )
+        self._credit.setOpenExternalLinks(True)
         self._credit.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         top_row.addWidget(self._credit)
 

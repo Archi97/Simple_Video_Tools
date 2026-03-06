@@ -49,7 +49,7 @@ class Worker(QObject):
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle(f"Video Editor v{VERSION}")
+        self.setWindowTitle(f"Simple Video Tools v{VERSION}")
         self.setMinimumSize(1000, 640)
         self.resize(1200, 720)
         self._video_info: Optional[VideoInfo] = None

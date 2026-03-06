@@ -1,8 +1,15 @@
-# Video Editor
+# Simple Video Tools
 
 A free, simple desktop video editor. No subscriptions, no cloud, no special software needed.
 
 Built with Python + PySide6 + ffmpeg.
+
+## Download
+
+| Version | Link |
+|---------|------|
+| Portable `.exe` | [Download](https://drive.google.com/file/d/1xEKaE4Q4jv0NhOcTZ0BzS3sK-dzEUpwj/view?usp=sharing) |
+| Installer | Coming soon |
 
 ---
 
@@ -23,7 +30,7 @@ Built with Python + PySide6 + ffmpeg.
 - Drag-and-drop file reordering
 - Save / load operation presets
 - Batch mode — process multiple files at once
-- Dark theme with custom title bar
+- Dark theme
 
 ---
 
@@ -75,4 +82,4 @@ See `BUILD.md` for instructions on building a portable `.exe` or a Windows insta
 
 - Windows only for now
 - Output files are saved to a folder you choose
-- Presets are stored in `%APPDATA%\VideoEditor\presets.json`
+- Presets are stored in `%APPDATA%\SimpleVideoTools\presets.json`

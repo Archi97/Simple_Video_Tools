@@ -1,14 +1,15 @@
 [Setup]
-AppName=Video Editor
+AppName=Simple Video Tools
 AppVersion=1.0
 AppPublisher=Tyombo
-DefaultDirName={autopf}\VideoEditor
-DefaultGroupName=Video Editor
+DefaultDirName={autopf}\SimpleVideoTools
+DefaultGroupName=Simple Video Tools
 OutputDir=dist
-OutputBaseFilename=VideoEditor_Setup
+OutputBaseFilename=SimpleVideoTools_Setup
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
+SetupIconFile=icon.ico
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -17,12 +18,12 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "Create a &desktop shortcut"; GroupDescription: "Additional icons:"
 
 [Files]
-Source: "dist\VideoEditor\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs
+Source: "dist\SimpleVideoTools\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs
 
 [Icons]
-Name: "{group}\Video Editor"; Filename: "{app}\VideoEditor.exe"
-Name: "{group}\Uninstall Video Editor"; Filename: "{uninstallexe}"
-Name: "{commondesktop}\Video Editor"; Filename: "{app}\VideoEditor.exe"; Tasks: desktopicon
+Name: "{group}\Simple Video Tools"; Filename: "{app}\SimpleVideoTools.exe"
+Name: "{group}\Uninstall Simple Video Tools"; Filename: "{uninstallexe}"
+Name: "{commondesktop}\Simple Video Tools"; Filename: "{app}\SimpleVideoTools.exe"; Tasks: desktopicon
 
 [Run]
-Filename: "{app}\VideoEditor.exe"; Description: "Launch Video Editor"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\SimpleVideoTools.exe"; Description: "Launch Simple Video Tools"; Flags: nowait postinstall skipifsilent

@@ -14,7 +14,7 @@ def _presets_path() -> str:
     else:
         base = os.environ.get("XDG_CONFIG_HOME", os.path.expanduser("~/.config"))
 
-    folder = os.path.join(base, "VideoEditor")
+    folder = os.path.join(base, "SimpleVideoTools")
     os.makedirs(folder, exist_ok=True)
     return os.path.join(folder, "presets.json")
 
