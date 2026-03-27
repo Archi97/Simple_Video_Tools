@@ -19,7 +19,7 @@ If you find it useful, a ⭐ star or a coffee would mean a lot!
 
 ## Screenshot
 
-![Screenshot](Git_medias/Interface.png)
+![Screenshot](Git_Medias/Interface.png)
 
 ---
 
